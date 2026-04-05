@@ -3,26 +3,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Booking {
-    private int roomNumber;
+    private Room room;
     private List<Guest> listOfGuests = new ArrayList<>();
     private LocalDate fromDate;
     private LocalDate toDate;
-    private String typeOfVacation;
+    private VacationType typeOfVacation;  // enum typ rekreační nebo pracovní
 
-    public Booking(int roomNumber, List<Guest> listOfGuests, LocalDate fromDate, LocalDate toDate, String typeOfVacation) {
-        this.roomNumber = roomNumber;
+
+    public Booking(Room room, List<Guest> listOfGuests, LocalDate fromDate, LocalDate toDate, VacationType typeOfVacation) {
+        this.room = room;
         this.listOfGuests.addAll(listOfGuests);
         this.fromDate = fromDate;
         this.toDate = toDate;
         this.typeOfVacation = typeOfVacation;
     }
 
-    public int getRoomNumber() {
-        return roomNumber;
+    // Konstruktor pro rekreační pobyt na 6 noci
+    public Booking(Room room, List<Guest> listOfGuests) {
+        this(room, listOfGuests, LocalDate.now(), LocalDate.now().plusDays(6), VacationType.RECREATIONAL);
     }
 
-    public void setRoomNumber(int roomNumber) {
-        this.roomNumber = roomNumber;
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoomNumber(Room room) {
+        this.room = room;
     }
 
     public List<Guest> getListOfGuests() {
@@ -49,11 +56,16 @@ public class Booking {
         this.toDate = toDate;
     }
 
-    public String getTypeOfVacation() {
+    public VacationType getTypeOfVacation() {
         return typeOfVacation;
     }
 
-    public void setTypeOfVacation(String typeOfVacation) {
+    public void setWorking(VacationType typeOfVacation) {
         this.typeOfVacation = typeOfVacation;
+    }
+
+    public enum VacationType {
+        RECREATIONAL,  // rekreační pobyt
+        BUSINESS       // pracovní pobyt
     }
 }
