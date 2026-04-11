@@ -1,4 +1,7 @@
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +12,12 @@ public class Booking {
     private LocalDate toDate;
     private VacationType typeOfVacation;  // enum typ rekreační nebo pracovní
 
+    public enum VacationType {
+        RECREATIONAL,  // rekreační pobyt
+        BUSINESS       // pracovní pobyt
+    }
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d. M. yyyy"); // format pro datum
 
     public Booking(Room room, List<Guest> listOfGuests, LocalDate fromDate, LocalDate toDate, VacationType typeOfVacation) {
         this.room = room;
@@ -64,8 +73,32 @@ public class Booking {
         this.typeOfVacation = typeOfVacation;
     }
 
-    public enum VacationType {
-        RECREATIONAL,  // rekreační pobyt
-        BUSINESS       // pracovní pobyt
+    // Počet nocí na pobyt
+    public long getBookingLength() {
+        return ChronoUnit.DAYS.between(this.fromDate, this.toDate);
+    }
+
+    // Cena rezervace
+    public BigDecimal getTotalPrice() {
+        long numberOfNights = getBookingLength();
+        BigDecimal pricePerNight = this.getRoom().getPricePerNight();
+
+        return pricePerNight.multiply(BigDecimal.valueOf(numberOfNights));
+    }
+
+    // Formátovaný výstup
+    public void getFormattedSummary() {
+        for (Guest guest : listOfGuests) {
+            String seaView = "ne";
+
+            if (this.getRoom().isHasSeaView()) {
+                seaView = "ano";
+            }
+
+            System.out.println(this.getFromDate().format(formatter) + " až " + this.getToDate().format(formatter) + ": "
+                    + guest.getFirstName() + " " + guest.getLastName() + " (" + guest.getDateOfBirth().format(formatter) + ")["
+                    + getListOfGuests().size() + "," + seaView + "] za "
+                    + this.getTotalPrice().intValue() + " Kč");
+        }
     }
 }
