@@ -46,6 +46,10 @@ public class BookingManager {
         int numberOfBookings = bookingList.size();
         int numberOfGuests = 0;
 
+        if (numberOfBookings == 0) {
+            return 0.0;
+        }
+
         for (Booking booking : bookingList){
             numberOfGuests += getGuestsCount(booking);
         }
