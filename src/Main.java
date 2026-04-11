@@ -7,6 +7,91 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        // naplneni dat
+        BookingManager data = new BookingManager();
+        data = fillBookings();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d. M. yyyy"); // format pro datum
+
+        // vypisy
+        System.out.println("Počet pracovních pobytů: " + data.getNumberOfWorkingBookings() + "\n");
+
+        System.out.println("Průměrný počet hostů na rezervaci: " + data.getAverageGuests() + "\n");
+
+        System.out.println("Prvních osm rekreačních rezervací:");
+        for (Booking booking : data.getTopNHolidayBookings()) {
+            for (Guest guest : booking.getListOfGuests()) {
+                System.out.println("Rezervace pro: " + guest.getFirstName() + ", " + guest.getLastName() + " (" + guest.getDateOfBirth().format(formatter) + ") na: 2. termín: "
+                    + booking.getFromDate().format(formatter) + " - " + booking.getToDate().format(formatter) + " pracovní pobyt: "
+                    + (booking.getTypeOfVacation().equals(Booking.VacationType.BUSINESS)? "ano": "ne"));
+            }
+
+        }
+
+        System.out.println("\n" + "Statistiky hostů:");
+        data.printGuestStatistics();
+
+        System.out.println("\n" + "Počet pracovních pobytů: " + data.getNumberOfWorkingBookings());
+
+        System.out.println("\n" + "Formátovaný výpis všech rezervací v systému:");
+        for (Booking booking : data.getBookings()) {
+            booking.getFormattedSummary();
+        }
+
+        // dalsi testy - pro uplnost
+        System.out.println("\n" + "Vypis prvni rezervace: ");
+        data.getBooking(1).getFormattedSummary();
+    }
+
+    // Domací úkol - lekce 3
+    public static BookingManager fillBookings() {
+        List<Guest> guests = new ArrayList<>();
+        BookingManager bookings = new BookingManager();
+
+        // pokoje
+        Room room1 = new Room(1, 1, true, true, BigDecimal.valueOf(1000.0));
+        Room room2 = new Room(2, 1, true, true, BigDecimal.valueOf(1000.0));
+        Room room3 = new Room(3, 3, false, true, BigDecimal.valueOf(2400.0));
+
+        //hosty
+        Guest guest101 = new Guest("Karel", "Dvořák", LocalDate.of(1990, 5, 15));
+        Guest guest102 = new Guest("Karel", "Dvořák", LocalDate.of(1979, 1, 3));
+        Guest guest103 = new Guest("Karolína", "Tmavá", LocalDate.of(1993, 9, 5));
+
+        // rezervace
+        guests.add(guest101);
+        Booking booking1 = new Booking(room3, guests, LocalDate.of(2023, 6, 1), LocalDate.of(2023, 6, 7), Booking.VacationType.BUSINESS);
+        guests.clear();
+        bookings.addBooking(booking1);
+
+        guests.add(guest102);
+        Booking booking2 = new Booking(room2, guests, LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 21), Booking.VacationType.RECREATIONAL);
+        guests.clear();
+        bookings.addBooking(booking2);
+
+        guests.add(guest103);
+        guests.add(guest101);
+        Booking booking3 = new Booking(room3, guests, LocalDate.of(2023, 8, 1), LocalDate.of(2023, 8, 31), Booking.VacationType.BUSINESS);
+        guests.clear();
+        bookings.addBooking(booking3);
+
+        LocalDate startDate = LocalDate.of(2023, 8, 1);
+        LocalDate endDate = startDate.plusDays(1);
+        guests.add(guest103);
+        for (int i = 0; i < 10; i++) {
+            bookings.addBooking(new Booking(room2, guests, startDate, endDate, Booking.VacationType.RECREATIONAL));
+            startDate = endDate.plusDays(1);
+            endDate = startDate.plusDays(1);
+        }
+        guests.clear();
+
+        return bookings;
+    }
+
+
+
+
+    // Domací úkol - lekce 2
+    public static void fillBookingsOld() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d. M. yyyy"); // format pro datum
         List<Guest> guests = new ArrayList<>(); // list pro hosty
         List<Booking> bookings = new ArrayList<>(); // list pro rezervace
@@ -43,29 +128,6 @@ public class Main {
         for (Booking booking: bookings) {
             for (Guest guest: booking.getListOfGuests()) {
                 System.out.println("Číslo pokoje: " + booking.getRoom().getRoomNumber()
-                                 + ", host: " + guest.getFirstName() + " " + guest.getLastName() + " (" +  guest.getDateOfBirth().format(formatter) + ")"
-                                 + ", od: " + booking.getFromDate().format(formatter)
-                                 + " do: " + booking.getToDate().format(formatter)
-                                 + ", typ pobytu: " + booking.getTypeOfVacation()
-                                 + "."
-                );
-            }
-        }
-
-        /*
-        // test 1: Zkus přidat dvě různé rezervace pro jednoho hosta na různé pokoje
-        guests.add(guest1);
-        Booking booking3 = new Booking(room1, guests, LocalDate.of(2021, 7, 1), LocalDate.of(2021, 7, 19), Booking.VacationType.BUSINESS);
-        Booking booking4 = new Booking(room2, guests, LocalDate.of(2021, 7, 1), LocalDate.of(2021, 7, 19), Booking.VacationType.BUSINESS);
-        guests.clear();
-
-        bookings.add(booking3);
-        bookings.add(booking4);
-
-        System.out.println("----- Testovací seznam rezervací - test 1 ------");
-        for (Booking booking: bookings) {
-            for (Guest guest: booking.getListOfGuests()) {
-                System.out.println("Číslo pokoje: " + booking.getRoom().getRoomNumber()
                         + ", host: " + guest.getFirstName() + " " + guest.getLastName() + " (" +  guest.getDateOfBirth().format(formatter) + ")"
                         + ", od: " + booking.getFromDate().format(formatter)
                         + " do: " + booking.getToDate().format(formatter)
@@ -74,59 +136,5 @@ public class Main {
                 );
             }
         }
-
-        // test 2: Zkus přidat dvě různé rezervace na jeden pokoj v různá data.
-        guests.add(guest2);
-        Booking booking5 = new Booking(room2, guests, LocalDate.of(2021, 2, 1), LocalDate.of(2021, 2, 15), Booking.VacationType.RECREATIONAL);
-        Booking booking6 = new Booking(room2, guests, LocalDate.of(2021, 10, 16), LocalDate.of(2021, 10, 22), Booking.VacationType.RECREATIONAL);
-        guests.clear();
-
-        bookings.add(booking5);
-        bookings.add(booking6);
-
-        System.out.println("----- Testovací seznam rezervací - test 2 ------");
-        for (Booking booking: bookings) {
-            for (Guest guest: booking.getListOfGuests()) {
-                System.out.println("Číslo pokoje: " + booking.getRoom().getRoomNumber()
-                        + ", host: " + guest.getFirstName() + " " + guest.getLastName() + " (" +  guest.getDateOfBirth().format(formatter) + ")"
-                        + ", od: " + booking.getFromDate().format(formatter)
-                        + " do: " + booking.getToDate().format(formatter)
-                        + ", typ pobytu: " + booking.getTypeOfVacation()
-                        + "."
-                );
-            }
-        }
-
-        // test 3: Je zajištěno, aby u každé rezervace byl registrovaný minimálně jeden host? Neměla by jít vytvořit rezervace bez hosta.
-        /*Booking booking7 = new Booking(room2, null, LocalDate.of(2021, 10, 16), LocalDate.of(2021, 10, 22), false);
-        padá na chybu:
-        Exception in thread "main" java.lang.NullPointerException: Cannot invoke "java.util.Collection.toArray()" because "c" is null
-            at java.base/java.util.ArrayList.addAll(ArrayList.java:752)
-            at Booking.<init>(Booking.java:14)
-            at Main.main(Main.java:100)
-         */
-
-        /*
-        // test 4: vložení rekreacniho pobytu na 6 noci
-        guests.add(guest1);
-        guests.add(guest2);
-        Booking booking7 = new Booking(room3, guests);
-        guests.clear();
-
-        bookings.add(booking7);
-
-        System.out.println("----- Testovací seznam rezervací - test 2 ------");
-        for (Booking booking: bookings) {
-            for (Guest guest: booking.getListOfGuests()) {
-                System.out.println("Číslo pokoje: " + booking.getRoom().getRoomNumber()
-                        + ", host: " + guest.getFirstName() + " " + guest.getLastName() + " (" +  guest.getDateOfBirth().format(formatter) + ")"
-                        + ", od: " + booking.getFromDate().format(formatter)
-                        + " do: " + booking.getToDate().format(formatter)
-                        + ", typ pobytu: " + booking.getTypeOfVacation()
-                        + "."
-                );
-            }
-        }
-         */
     }
 }
