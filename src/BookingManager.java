@@ -36,11 +36,6 @@ public class BookingManager {
         return numberOfWorkingBookings;
     }
 
-    // počet hostů dané rezervace celkem
-    public int getGuestsCount(Booking booking) {
-        return booking.getListOfGuests().size();
-    }
-
     // Průměrný počet hostů na rezervaci
     public double getAverageGuests() {
         int numberOfBookings = bookingList.size();
@@ -51,7 +46,7 @@ public class BookingManager {
         }
 
         for (Booking booking : bookingList){
-            numberOfGuests += getGuestsCount(booking);
+            numberOfGuests += booking.getGuestsCount(booking);
         }
 
         return (double) numberOfGuests/numberOfBookings;
@@ -59,7 +54,7 @@ public class BookingManager {
 
     // Vrať prvních osm rekreačních rezervací
     public List<Booking>  getTopNHolidayBookings() {
-        int N = 8;
+        int n = 8;
         List<Booking>  TopNHolidayBookings = new ArrayList<>();
 
         for (Booking booking : bookingList){
@@ -67,7 +62,7 @@ public class BookingManager {
                 TopNHolidayBookings.add(booking);
             }
 
-            if (TopNHolidayBookings.size() == N) {
+            if (TopNHolidayBookings.size() == n) {
                 break;
             }
         }
