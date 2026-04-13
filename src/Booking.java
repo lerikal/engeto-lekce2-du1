@@ -73,6 +73,11 @@ public class Booking {
         this.typeOfVacation = typeOfVacation;
     }
 
+    // počet hostů dané rezervace celkem
+    public int getGuestsCount(Booking booking) {
+        return booking.getListOfGuests().size();
+    }
+
     // Počet nocí na pobyt
     public long getBookingLength() {
         return ChronoUnit.DAYS.between(this.fromDate, this.toDate);
